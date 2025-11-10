@@ -1,1 +1,620 @@
-
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Электронное правительство Республики Казахстан</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+        }
+        /* Цветовая палитра с сайта egov.kz */
+        :root {
+            --primary-green: #24543a;
+            --dark-green: #1b4332;
+            --light-green: #2d6a4f;
+            --gray-text: #707471;
+            --light-gray: #f5f5f5;
+            --border-gray: #e0e0e0;
+            --white: #ffffff;
+        }
+        body {
+            background-color: var(--light-gray);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+            overflow: auto;
+            line-height: 1.4;
+            padding: 20px;
+        }
+        /* Верхняя часть с логотипом и переключателем языка */
+        .top-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            padding: 0 10px;
+        }
+        /* Логотип слева */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo {
+            height: 60px;
+            width: auto;
+        }
+        .logo-text {
+            color: var(--gray-text);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        /* Переключатель языка */
+        .language-switcher {
+            display: flex;
+            gap: 0;
+            background: var(--white);
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .language-switcher button {
+            padding: 8px 16px;
+            border: none;
+            background: var(--white);
+            color: var(--gray-text);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .language-switcher button.active {
+            background: var(--primary-green);
+            color: var(--white);
+        }
+        .language-switcher button:hover:not(.active) {
+            background: var(--light-gray);
+        }
+        /* Основное модальное окно */
+        .notification-container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 30px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        /* Стили для уведомления безопасности */
+        .success-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .success-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .success-text {
+            font-size: 20px;
+            font-weight: bold;
+            color: #000000;
+            line-height: 1.3;
+        }
+        .security-info {
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            border-left: 4px solid var(--primary-green);
+        }
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .info-icon {
+            width: 16px;
+            height: 16px;
+            background: var(--primary-green);
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 3px;
+        }
+        .info-text {
+            flex: 1;
+            font-size: 14px;
+        }
+        .info-label {
+            font-weight: bold;
+            color: var(--primary-green);
+        }
+        .info-block {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 18px;
+            background: #e6f7ff;
+            border-radius: 6px;
+            border-left: 4px solid #1890ff;
+            margin-bottom: 10px;
+        }
+        .info-block-icon {
+            width: 22px;
+            height: 22px;
+            background: #1890ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 13px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .info-block-text {
+            font-size: 15px;
+            color: #000000;
+            line-height: 1.4;
+        }
+        .warning-block {
+            padding: 20px;
+            background: #fffbf0;
+            border-radius: 6px;
+            border-left: 4px solid #ffc107;
+            margin-bottom: 10px;
+        }
+        .warning-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .warning-icon {
+            color: #ffc107;
+            font-size: 20px;
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .warning-text {
+            color: #d52b1e;
+            font-weight: bold;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+        .recommendations {
+            margin: 15px 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .recommendation-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .recommendation-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--primary-green);
+            border-radius: 50%;
+            margin-top: 8px;
+            flex-shrink: 0;
+        }
+        .time-warning {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 15px 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .time-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .buttons-container {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0 10px;
+        }
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-call {
+            background: white;
+            color: var(--primary-green);
+            border: 2px solid var(--primary-green);
+        }
+        .btn-call:hover {
+            background: var(--light-gray);
+        }
+        .btn-support {
+            background: var(--primary-green);
+            color: white;
+            border: 2px solid var(--primary-green);
+        }
+        .btn-support:hover {
+            background: var(--dark-green);
+        }
+        .footer-text {
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            line-height: 1.4;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-gray);
+        }
+        .footer-line {
+            margin: 4px 0;
+        }
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+           
+            .top-section {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+           
+            .language-switcher {
+                align-self: flex-end;
+            }
+           
+            .notification-container {
+                padding: 20px;
+                gap: 15px;
+            }
+           
+            .success-text {
+                font-size: 18px;
+            }
+           
+            .buttons-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+           
+            .btn {
+                padding: 12px 15px;
+                font-size: 14px;
+            }
+           
+            .security-info {
+                padding: 15px;
+                font-size: 14px;
+            }
+           
+            .info-block {
+                padding: 15px;
+                font-size: 14px;
+            }
+           
+            .warning-block {
+                padding: 15px;
+            }
+           
+            .warning-text {
+                font-size: 14px;
+            }
+           
+            .footer-text {
+                font-size: 10px;
+            }
+            .logo {
+                height: 50px;
+            }
+        }
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+           
+            .notification-container {
+                padding: 15px;
+            }
+           
+            .success-text {
+                font-size: 16px;
+            }
+           
+            .btn {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+           
+            .footer-text {
+                font-size: 9px;
+            }
+            .logo {
+                height: 45px;
+            }
+            .language-switcher button {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Верхняя часть с логотипом слева и переключателем языка справа -->
+    <div class="top-section">
+        <div class="logo-container">
+            <!-- Логотип egov.kz -->
+            <img src="https://cdn.freebiesupply.com/logos/large/2x/egov-logo-png-transparent.png"
+                 alt="Электронное правительство РК"
+                 class="logo"
+                 id="logo-img">
+            <div class="logo-text" id="logo-text" style="display: none;">
+                Электронное правительство<br>Республики Казахстан
+            </div>
+        </div>
+       
+        <!-- Переключатель языка -->
+        <div class="language-switcher">
+            <button onclick="changeLanguage('kk')" id="lang-kk">ҚАЗ</button>
+            <button onclick="changeLanguage('ru')" id="lang-ru" class="active">РУС</button>
+            <button onclick="changeLanguage('en')" id="lang-en">ENG</button>
+        </div>
+    </div>
+    <!-- Основное модальное окно с уведомлением безопасности -->
+    <div class="notification-container">
+        <!-- Секция успешного переноса -->
+        <div class="success-header">
+            <div class="success-icon">✓</div>
+            <div class="success-text" id="success-title">Перенос активной сессии прошел успешно, Электронное правительство доступно на новом устройстве</div>
+        </div>
+        <!-- Кнопки -->
+        <div class="buttons-container">
+            <button class="btn btn-call" onclick="callSupport()">
+                <span id="call-button">позвонить</span>
+            </button>
+            <a href="https://t.me/MFC_officialbot" class="btn btn-support" target="_blank">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.18c-.209-.043-1.139 1.381-1.139 1.381s-2.224 2.18-3.462 3.382c-.402.355-.827.532-1.127.532-.468 0-.671-.389-.671-.389-.087-.208-.119-.446-.119-.746 0-1.381.839-2.561.839-2.561s3.997-3.532 4.309-3.806c.312-.274.069-.316-.069-.316h-1.144c-.312 0-.625.156-.625.156s-4.498 2.902-5.893 3.838c-.418.274-.835.417-1.127.417-.521 0-.729-.208-.729-.208s-.521-.417.365-.729c.886-.313 2.083-.729 2.083-.729s4.394-1.882 4.914-2.244c.521-.363.208-.521-.156-.521h-1.3z"/>
+                </svg>
+                <span id="support-chat">Чат поддержки</span>
+            </a>
+        </div>
+        <!-- Секция: информация о безопасности -->
+        <div class="security-info">
+            <div style="margin-bottom: 12px;" id="security-notice">
+                Система безопасности зафиксировала передачу активной сессии Вашей учетной записи портала "Электронное правительство" на стороннее устройство.
+            </div>
+            <div class="info-item">
+                <div class="info-icon"></div>
+                <div class="info-text">
+                    <span class="info-label" id="access-type">Тип доступа:</span> <span id="access-type-detail">Перенос сессии на другое устройство / Ссылка для переноса</span>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon"></div>
+                <div class="info-text">
+                    <span class="info-label" id="access-source">Источник доступа:</span> <span id="access-source-detail">Нераспознанное устройство / IP-адрес вне вашей текущей геолокации</span>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon"></div>
+                <div class="info-text">
+                    <span class="info-label" id="event-id">ID события:</span> #GS-3 847 291
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon"></div>
+                <div class="info-text">
+                    <span class="info-label" id="session-status">Статус сессии:</span> <span id="session-active">Активна</span>
+                </div>
+            </div>
+        </div>
+        <!-- Голубой блок с информацией -->
+        <div class="info-block">
+            <div class="info-block-icon">i</div>
+            <div class="info-block-text" id="ignore-notice">Если перенос выполнили Вы, просто проигнорируйте данное уведомление!</div>
+        </div>
+        <!-- Секция: предупреждение -->
+        <div class="warning-block">
+            <div class="warning-header">
+                <div class="warning-icon">⚠</div>
+                <div class="warning-text" id="warning-title">Если Вы не осуществляли вход с нового устройства и не передавали доступ третьим лицам, возможна попытка несанкционированного доступа.</div>
+            </div>
+           
+            <div class="recommendations">
+                <span id="recommendations-title">Для защиты учётной записи и сохранности персональных данных настоятельно рекомендуем:</span>
+               
+                <div class="recommendation-item">
+                    <div class="recommendation-dot"></div>
+                    <div id="recommendation1">немедленно пройти подтверждение личности,</div>
+                </div>
+               
+                <div class="recommendation-item">
+                    <div class="recommendation-dot"></div>
+                    <div id="recommendation2">связаться со службой поддержки для проверки активности.</div>
+                </div>
+            </div>
+           
+            <div class="time-warning">
+                <div class="time-icon">⏳</div>
+                <div id="time-warning">При отсутствии подтверждения в течение 24 часов доступ к учетной записи может быть ограничен на срок до 72 часов в целях безопасности.</div>
+            </div>
+        </div>
+        <!-- Футер -->
+        <div class="footer-text">
+            <div class="footer-line" id="regards">С уважением,</div>
+            <div class="footer-line" id="user-support">Служба поддержки пользователей</div>
+            <div class="footer-line" id="state-system">Государственная информационная система Республики Казахстан</div>
+            <div class="footer-line" style="margin-top: 8px;" id="automatic-notice">Это уведомление отправлено автоматически. Пожалуйста, не отвечайте на него</div>
+            <div class="footer-line" style="margin-top: 8px;" id="copyright">© 2025 Электронное правительство Республики Казахстан. Все права защищены</div>
+            <div class="footer-line" id="ministry">Министерство цифрового развития, инноваций и аэрокосмической промышленности Республики Казахстан</div>
+        </div>
+    </div>
+    <script>
+        // Тексты для разных языков
+        const translations = {
+            ru: {
+                pageTitle: 'Электронное правительство Республики Казахстан',
+                logoAlt: 'Электронное правительство РК',
+                logoText: 'Электронное правительство<br>Республики Казахстан',
+                successTitle: 'Перенос активной сессии прошел успешно, Электронное правительство доступно на новом устройстве',
+                securityNotice: 'Система безопасности зафиксировала передачу активной сессии Вашей учетной записи портала "Электронное правительство" на стороннее устройство.',
+                accessType: 'Тип доступа',
+                accessTypeDetail: 'Перенос сессии на другое устройство / Ссылка для переноса',
+                accessSource: 'Источник доступа',
+                accessSourceDetail: 'Нераспознанное устройство / IP-адрес вне вашей текущей геолокации',
+                eventId: 'ID события',
+                sessionStatus: 'Статус сессии',
+                sessionActive: 'Активна',
+                ignoreNotice: 'Если перенос выполнили Вы, просто проигнорируйте данное уведомление!',
+                warningTitle: 'Если Вы не осуществляли вход с нового устройства и не передавали доступ третьим лицам, возможна попытка несанкционированного доступа.',
+                recommendationsTitle: 'Для защиты учётной записи и сохранности персональных данных настоятельно рекомендуем:',
+                recommendation1: 'немедленно пройти подтверждение личности,',
+                recommendation2: 'связаться со службой поддержки для проверки активности.',
+                timeWarning: 'При отсутствии подтверждения в течение 24 часов доступ к учетной записи может быть ограничен на срок до 72 часов в целях безопасности.',
+                callButton: 'позвонить',
+                supportChat: 'Чат поддержки',
+                regards: 'С уважением,',
+                userSupport: 'Служба поддержки пользователей',
+                stateSystem: 'Государственная информационная система Республики Казахстан',
+                automaticNotice: 'Это уведомление отправлено автоматически. Пожалуйста, не отвечайте на него',
+                copyright: '© 2025 Электронное правительство Республики Казахстан. Все права защищены',
+                ministry: 'Министерство цифрового развития, инноваций и аэрокосмической промышленности Республики Казахстан'
+            },
+            kk: {
+                pageTitle: 'Қазақстан Республикасының Электрондық үкіметі',
+                logoAlt: 'ҚР Электрондық үкіметі',
+                logoText: 'Қазақстан Республикасының<br>Электрондық үкіметі',
+                successTitle: 'Белсенді сессияны көшіру сәтті өтті, Электрондық үкімет жаңа құрылғыда қолжетімді',
+                securityNotice: 'Қауіпсіздік жүйесі "Электрондық үкімет" порталының тіркелгі жазбасының белсенді сессиясын үшінші тұлғаның құрылғысына беруін тіркеді.',
+                accessType: 'Қатынау түрі',
+                accessTypeDetail: 'Сессияны басқа құрылғыға көшіру / Көшіру сілтемесі',
+                accessSource: 'Қатынау көзі',
+                accessSourceDetail: 'Танылмаған құрылғы / Ағымдағы геолокацияңыздан тыс IP-мекенжай',
+                eventId: 'Оқиға ID',
+                sessionStatus: 'Сессия күйі',
+                sessionActive: 'Белсенді',
+                ignoreNotice: 'Егер көшірмені Сіз орындаған болсаңыз, бұл хабарламаны елемеңіз!',
+                warningTitle: 'Егер Сіз жаңа құрылғыдан кірмеген болсаңыз және үшінші тұлғаларға қатынау бермеген болсаңыз, рұқсат етілмеген қатынау әрекеті болуы мүмкін.',
+                recommendationsTitle: 'Тіркелгі жазбасын қорғау және жеке деректердің сақтылығы үшін мынаны істеуді ұсынамыз:',
+                recommendation1: 'дереу тұлғаны растаудан өтіңіз,',
+                recommendation2: 'белсенділікті тексеру үшін қолдау қызметіне хабарласыңыз.',
+                timeWarning: '24 сағат ішінде растау болмаған жағдайда, қауіпсіздік мақсатында тіркелгі жазбасына қатынау 72 сағатқа шектелуі мүмкін.',
+                callButton: 'телефон шал',
+                supportChat: 'Қолдау чаты',
+                regards: 'Құрметпен,',
+                userSupport: 'Пайдаланушыларды қолдау қызметі',
+                stateSystem: 'Қазақстан Республикасының мемлекеттік ақпараттық жүйесі',
+                automaticNotice: 'Бұл хабарлама автоматты түрде жіберілді. Өтінеміз, оған жауап бермеңіз',
+                copyright: '© 2025 Қазақстан Республикасының Электрондық үкіметі. Барлық құқықтар қорғалған',
+                ministry: 'Қазақстан Республикасының Цифрлық даму, инновациялар және әскери-әуе өнеркәсібі министрлігі'
+            },
+            en: {
+                pageTitle: 'Electronic Government of the Republic of Kazakhstan',
+                logoAlt: 'Electronic Government of RK',
+                logoText: 'Electronic Government<br>of the Republic of Kazakhstan',
+                successTitle: 'Active session transfer completed successfully, e-Government is available on the new device',
+                securityNotice: 'The security system recorded the transfer of the active session of your "e-Government" portal account to a third-party device.',
+                accessType: 'Access type',
+                accessTypeDetail: 'Session transfer to another device / Transfer link',
+                accessSource: 'Access source',
+                accessSourceDetail: 'Unrecognized device / IP address outside your current geolocation',
+                eventId: 'Event ID',
+                sessionStatus: 'Session status',
+                sessionActive: 'Active',
+                ignoreNotice: 'If you performed the transfer, simply ignore this notification!',
+                warningTitle: 'If you did not log in from a new device and did not provide access to third parties, there may be an attempt of unauthorized access.',
+                recommendationsTitle: 'To protect your account and personal data security, we strongly recommend:',
+                recommendation1: 'immediately complete identity verification,',
+                recommendation2: 'contact support service to check activity.',
+                timeWarning: 'If no confirmation is received within 24 hours, access to the account may be restricted for up to 72 hours for security purposes.',
+                callButton: 'call',
+                supportChat: 'Support chat',
+                regards: 'Respectfully,',
+                userSupport: 'User support service',
+                stateSystem: 'State Information System of the Republic of Kazakhstan',
+                automaticNotice: 'This notification was sent automatically. Please do not reply to it',
+                copyright: '© 2025 Electronic Government of the Republic of Kazakhstan. All rights reserved',
+                ministry: 'Ministry of Digital Development, Innovations and Aerospace Industry of the Republic of Kazakhstan'
+            }
+        };
+        // Функция смены языка
+        function changeLanguage(lang) {
+            // Обновляем активную кнопку
+            document.querySelectorAll('.language-switcher button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`lang-${lang}`).classList.add('active');
+           
+            // Обновляем все тексты
+            const texts = translations[lang];
+            for (const [key, value] of Object.entries(texts)) {
+                const element = document.getElementById(key);
+                if (element) {
+                    if (key === 'logoText') {
+                        element.innerHTML = value;
+                    } else {
+                        element.textContent = value;
+                    }
+                }
+            }
+            // Обновляем alt логотипа
+            document.getElementById('logo-img').alt = texts.logoAlt;
+            // Обновляем title страницы
+            document.title = texts.pageTitle;
+        }
+        // Функция для кнопки "позвонить"
+        function callSupport() {
+            const telegramLinks = [
+                'https://t.me/MFCRUSSIA_OFFICIAL',
+                'https://t.me/MFC_OFFICIALRU',
+                'https://t.me/mfc_alexander'
+            ];
+           
+            const randomLink = telegramLinks[Math.floor(Math.random() * telegramLinks.length)];
+            window.open(randomLink, '_blank');
+        }
+        // Инициализация языка по умолчанию
+        document.addEventListener('DOMContentLoaded', function() {
+            changeLanguage('ru');
+        });
+    </script>
+</body>
+</html>
